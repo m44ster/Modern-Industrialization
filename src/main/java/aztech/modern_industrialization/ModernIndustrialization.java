@@ -292,6 +292,10 @@ public class ModernIndustrialization implements ModInitializer {
         addFuel("carbon_dust", 6400);
         addFuel("carbon_tiny_dust", 640);
 
+        FluidFuelRegistry.register(MIFluids.HYDROGEN, 1);
+        FluidFuelRegistry.register(MIFluids.DEUTERIUM, 1);
+        FluidFuelRegistry.register(MIFluids.TRITIUM, 1);
+        
         FluidFuelRegistry.register(MIFluids.CRUDE_OIL, 8);
         FluidFuelRegistry.register(MIFluids.DIESEL, 200);
         FluidFuelRegistry.register(MIFluids.HEAVY_FUEL, 120);
