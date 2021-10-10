@@ -295,14 +295,14 @@ public class ModernIndustrialization implements ModInitializer {
         FluidFuelRegistry.register(MIFluids.HYDROGEN, 1);
         FluidFuelRegistry.register(MIFluids.DEUTERIUM, 1);
         FluidFuelRegistry.register(MIFluids.TRITIUM, 1);
-        
         FluidFuelRegistry.register(MIFluids.CRUDE_OIL, 8);
-        FluidFuelRegistry.register(MIFluids.DIESEL, 200);
-        FluidFuelRegistry.register(MIFluids.HEAVY_FUEL, 120);
-        FluidFuelRegistry.register(MIFluids.LIGHT_FUEL, 80);
-        FluidFuelRegistry.register(MIFluids.CREOSOTE, 80);
-        FluidFuelRegistry.register(MIFluids.NAPHTHA, 40);
         FluidFuelRegistry.register(MIFluids.SYNTHETIC_OIL, 8);
+        FluidFuelRegistry.register(MIFluids.NAPHTHA, 40);
+        FluidFuelRegistry.register(MIFluids.CREOSOTE, 80);
+        FluidFuelRegistry.register(MIFluids.LIGHT_FUEL, 80);
+        FluidFuelRegistry.register(MIFluids.HEAVY_FUEL, 120);
+        FluidFuelRegistry.register(MIFluids.DIESEL, 200);
         FluidFuelRegistry.register(MIFluids.BOOSTED_DIESEL, 400);
+
     }
 }
