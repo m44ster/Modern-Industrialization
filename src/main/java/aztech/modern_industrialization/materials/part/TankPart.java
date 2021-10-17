@@ -47,7 +47,7 @@ public class TankPart extends UnbuildablePart<Integer> {
     }
 
     @Override
-    public BuildablePart of(Integer bucketCapacity) {
+    public RegularPart of(Integer bucketCapacity) {
         MutableObject<BlockEntityType<BlockEntity>> bet = new MutableObject<>();
         long capacity = FluidConstants.BUCKET * bucketCapacity;
 

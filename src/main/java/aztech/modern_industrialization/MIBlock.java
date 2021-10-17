@@ -112,11 +112,20 @@ public class MIBlock extends Block {
                 .allowsSpawning(MobSpawning.NO_SPAWN));
     }
 
+    public MIBlock(String id, float resistance) {
+        this(id, FabricBlockSettings.of(METAL_MATERIAL).hardness(4.0f).resistance(resistance).breakByTool(FabricToolTags.PICKAXES).requiresTool()
+                .allowsSpawning(MobSpawning.NO_SPAWN));
+    }
+
     // hull
     public static final MIBlock BASIC_MACHINE_HULL = new MIBlock("basic_machine_hull");
     public static final MIBlock ADVANCED_MACHINE_HULL = new MIBlock("advanced_machine_hull");
     public static final MIBlock TURBO_MACHINE_HULL = new MIBlock("turbo_machine_hull");
     public static final MIBlock HIGHLY_ADVANCED_MACHINE_HULL = new MIBlock("highly_advanced_machine_hull");
+    public static final MIBlock QUANTUM_MACHINE_HULL = new MIBlock("quantum_machine_hull", 6000);
+
+    // Multiblock
+    public static final MIBlock FUSION_CHAMBER = new MIBlock("fusion_chamber");
 
     // other
     public static final MIBlock INDUSTRIAL_TNT = new MIBlock("industrial_tnt",
@@ -140,6 +149,12 @@ public class MIBlock extends Block {
     public MIBlock setBlockModel(JModel blockModel) {
         this.blockModel = blockModel;
         return this;
+    }
+
+    public MIBlock asColumn() {
+        return this.setBlockModel(JModel.model().parent("block/cube_column")
+                .textures(new JTextures().var("end", ModernIndustrialization.MOD_ID + ":blocks/" + id + "_end").var("side",
+                        ModernIndustrialization.MOD_ID + ":blocks/" + id + "_side")));
     }
 
     public MIBlock setItemModel(JModel itemModel) {

@@ -28,6 +28,7 @@ import aztech.modern_industrialization.api.FluidFuelRegistry;
 import aztech.modern_industrialization.api.energy.CableTier;
 import aztech.modern_industrialization.machines.MachineBlockEntity;
 import aztech.modern_industrialization.machines.blockentities.*;
+import aztech.modern_industrialization.machines.models.MachineCasing;
 import aztech.modern_industrialization.machines.models.MachineCasings;
 import aztech.modern_industrialization.machines.models.MachineModels;
 import net.fabricmc.api.EnvType;
@@ -93,12 +94,14 @@ public class SingleBlockSpecialMachines {
                     AbstractStorageMachineBlockEntity::registerEnergyApi);
 
             if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-                MachineModels.addTieredMachine(lowToUp, "transformer", TransformerMachineBlockEntity.getCasingFromTier(low, up), true, true, true,
-                        false);
-                MachineModels.addTieredMachine(upToLow, "transformer", TransformerMachineBlockEntity.getCasingFromTier(up, low), true, true, true,
-                        false);
+                MachineModels.addTieredMachine(lowToUp, "transformer", getTransformerCasingFromTier(low, up), true, true, true, false);
+                MachineModels.addTieredMachine(upToLow, "transformer", getTransformerCasingFromTier(up, low), true, true, true, false);
             }
         }
+    }
+
+    public static MachineCasing getTransformerCasingFromTier(CableTier from, CableTier to) {
+        return MachineCasings.casingFromCableTier(from.eu > to.eu ? to : from);
     }
 
     private static void registerSteamTurbines(int... maxConsumption) {

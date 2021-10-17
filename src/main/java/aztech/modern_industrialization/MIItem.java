@@ -133,6 +133,10 @@ public final class MIItem {
     public static final Item ITEM_RANDOM_ACCESS_MEMORY = of("random_access_memory");
     public static final Item ITEM_MEMORY_MANAGEMENT_UNIT = of("memory_management_unit");
 
+    public static final Item ITEM_QUANTUM_CIRCUIT_BOARD = of("quantum_circuit_board");
+    public static final Item ITEM_QUANTUM_CIRCUIT = of("quantum_circuit");
+    public static final Item ITEM_QBIT = of("qbit");
+
     public static final Item ITEM_MONOCRYSTALLINE_SILICON = of("monocrystalline_silicon");
     public static final Item ITEM_SILICON_WAFER = of("silicon_wafer");
 
@@ -148,12 +152,11 @@ public final class MIItem {
     public static final Item LARGE_ADVANCED_PUMP = of("large_advanced_pump");
 
     public static final Item MIXED_INGOT_BLASTPROOF = of("mixed_ingot_blastproof");
-    public static final Item MIXED_PLATE_NUCLEAR = of("mixed_plate_nuclear");
-    public static final Item AIR_INTAKE = of("air_intake", 1);
+    public static final Item MIXED_INGOT_IRIDIUM = of("mixed_ingot_iridium");
 
-    // TO MATERIAL ?
-    public static final Item ITEM_POLYETHYLENE_SHEET = of("polyethylene_sheet");
-    public static final Item ITEM_POLYVINYL_CHLORIDE_SHEET = of("polyvinyl_chloride_sheet");
+    public static final Item MIXED_PLATE_NUCLEAR = of("mixed_plate_nuclear");
+
+    public static final Item AIR_INTAKE = of("air_intake", 1);
 
     public static final Item ITEM_PACKER_BLOCK_TEMPLATE = of("packer_block_template", 1);
     public static final Item ITEM_PACKER_DOUBLE_INGOT_TEMPLATE = of("packer_double_ingot_template", 1);
@@ -172,5 +175,7 @@ public final class MIItem {
 
     public static final SteamDrillItem ITEM_STEAM_MINING_DRILL = (SteamDrillItem) of(SteamDrillItem::new, "steam_mining_drill", 1, true);
     public static final Item ITEM_CROWBAR = of(CrowbarItem::new, "crowbar", 1, true);
+
+    public static final Item COOLING_CELL = of("cooling_cell");
 
 }

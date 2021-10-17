@@ -45,7 +45,7 @@ public class BarrelPart extends UnbuildablePart<Integer> {
     }
 
     @Override
-    public BuildablePart of(Integer stackCapacity) {
+    public RegularPart of(Integer stackCapacity) {
 
         BlockEntityType<BlockEntity>[] refs = new BlockEntityType[1]; // evil hack
 
