@@ -81,7 +81,7 @@ public class TextHelper {
         } else {
             return "" + eu;
         }
-        return String.format("%.2f", ((double) eu) / div);
+        return String.format("%.1f", ((double) eu) / div);
     }
 
     public static String getEuString(double eu) {

@@ -31,8 +31,6 @@ import aztech.modern_industrialization.util.MobSpawning;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import net.devtech.arrp.json.models.JModel;
-import net.devtech.arrp.json.models.JTextures;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -69,10 +67,7 @@ public class BarrelBlock extends MIBlock implements BlockEntityProvider {
         super(id, FabricBlockSettings.of(METAL_MATERIAL).hardness(4.0f).breakByTool(FabricToolTags.PICKAXES).requiresTool()
                 .allowsSpawning(MobSpawning.NO_SPAWN), blockItemCtor);
 
-        this.setBlockModel(JModel.model().parent("block/cube_column")
-                .textures(new JTextures().var("end", ModernIndustrialization.MOD_ID + ":blocks/" + id + "_end").var("side",
-                        ModernIndustrialization.MOD_ID + ":blocks/" + id + "_side")));
-
+        this.asColumn();
         this.factory = factory;
     }
 
