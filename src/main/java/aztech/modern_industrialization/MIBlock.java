@@ -130,6 +130,9 @@ public class MIBlock extends Block {
     // other
     public static final MIBlock INDUSTRIAL_TNT = new MIBlock("industrial_tnt",
             Settings.of(Material.TNT).breakInstantly().sounds(BlockSoundGroup.GRASS));
+
+    public static final MIBlock NUKE = new MIBlock("nuke", Settings.of(Material.TNT).breakInstantly().sounds(BlockSoundGroup.GRASS));
+
     public static final MIBlock BLOCK_FIRE_CLAY_BRICKS = new MIBlock("fire_clay_bricks",
             FabricBlockSettings.of(STONE_MATERIAL).hardness(2.0f).resistance(6.0f).breakByTool(FabricToolTags.PICKAXES, 0).requiresTool());
 
