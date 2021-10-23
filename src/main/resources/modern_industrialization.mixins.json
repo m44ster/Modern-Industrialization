@@ -10,6 +10,7 @@
     "LivingEntityMixin",
     "PlayerEntityMixin",
     "PlayerEntitySteamDrillMixin",
+    "PlayerEntityTickMixin",
     "PlayerInventoryMixin",
     "RecipeManagerAccessor",
     "ReloadableResourceManagerImplMixin",
