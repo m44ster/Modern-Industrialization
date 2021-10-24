@@ -27,6 +27,7 @@ import aztech.modern_industrialization.api.pipes.item.SpeedUpgrade;
 import aztech.modern_industrialization.items.FluidFuelItemHelper;
 import aztech.modern_industrialization.items.GuideBookItem;
 import aztech.modern_industrialization.items.SteamDrillItem;
+import aztech.modern_industrialization.items.armor.GraviChestPlateItem;
 import aztech.modern_industrialization.items.armor.JetpackItem;
 import aztech.modern_industrialization.items.armor.RubberArmorMaterial;
 import aztech.modern_industrialization.items.diesel_tools.DieselToolItem;
@@ -177,5 +178,7 @@ public final class MIItem {
     public static final Item ITEM_CROWBAR = of(CrowbarItem::new, "crowbar", 1, true);
 
     public static final Item COOLING_CELL = of("cooling_cell");
+
+    public static final GraviChestPlateItem GRAVI_CHEST_PLATE = (GraviChestPlateItem) of(GraviChestPlateItem::new, "gravichestplate", 1);
 
 }
