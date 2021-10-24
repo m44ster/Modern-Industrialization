@@ -45,6 +45,10 @@ public class TextHelper {
     public static final Style RED = Style.EMPTY.withColor(Formatting.RED);
     public static final Style GREEN = Style.EMPTY.withColor(Formatting.GREEN);
 
+    public static String formatEu(double eu) {
+        return getEuString(eu) + " " + getEuUnit(eu);
+    }
+
     public static String getEuUnit(double eu) {
         if (eu > 1e12) {
             return "TEU";

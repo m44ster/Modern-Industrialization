@@ -21,35 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.recipe.json;
+package aztech.modern_industrialization.mixin_impl;
 
-@SuppressWarnings({ "FieldCanBeLocal", "MismatchedQueryAndUpdateOfCollection", "UnusedDeclaration" })
-public class SmeltingRecipeJson implements RecipeJson {
-    private final String type;
-    private final int cookingtime;
-    private final double experience;
-    private final Ingredient ingredient;
-    private final String result;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.entity.player.PlayerEntity;
 
-    public enum SmeltingRecipeType {
-        SMELTING,
-        BLASTING;
-
-        public static SmeltingRecipeType ofBlasting(boolean blasting) {
-            return blasting ? BLASTING : SMELTING;
+/**
+ * Should probably be PR'ed into fabric API.
+ */
+public interface PlayerTickEvent {
+    Event<PlayerTickEvent> EVENT = EventFactory.createArrayBacked(PlayerTickEvent.class, listeners -> player -> {
+        for (PlayerTickEvent listener : listeners) {
+            listener.onTick(player);
         }
-    }
+    });
 
-    public static class Ingredient {
-        String item;
-    }
-
-    public SmeltingRecipeJson(SmeltingRecipeType type, String inputItem, String outputItem, int cookingtime, double experience) {
-        this.type = type == SmeltingRecipeType.SMELTING ? "minecraft:smelting" : "minecraft:blasting";
-        this.cookingtime = cookingtime;
-        this.experience = experience;
-        this.ingredient = new Ingredient();
-        ingredient.item = inputItem;
-        result = outputItem;
-    }
+    void onTick(PlayerEntity player);
 }

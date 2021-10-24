@@ -21,35 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.recipe.json;
+package aztech.modern_industrialization.mixin;
 
-@SuppressWarnings({ "FieldCanBeLocal", "MismatchedQueryAndUpdateOfCollection", "UnusedDeclaration" })
-public class SmeltingRecipeJson implements RecipeJson {
-    private final String type;
-    private final int cookingtime;
-    private final double experience;
-    private final Ingredient ingredient;
-    private final String result;
+import aztech.modern_industrialization.mixin_impl.PlayerTickEvent;
+import net.minecraft.entity.player.PlayerEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-    public enum SmeltingRecipeType {
-        SMELTING,
-        BLASTING;
-
-        public static SmeltingRecipeType ofBlasting(boolean blasting) {
-            return blasting ? BLASTING : SMELTING;
-        }
-    }
-
-    public static class Ingredient {
-        String item;
-    }
-
-    public SmeltingRecipeJson(SmeltingRecipeType type, String inputItem, String outputItem, int cookingtime, double experience) {
-        this.type = type == SmeltingRecipeType.SMELTING ? "minecraft:smelting" : "minecraft:blasting";
-        this.cookingtime = cookingtime;
-        this.experience = experience;
-        this.ingredient = new Ingredient();
-        ingredient.item = inputItem;
-        result = outputItem;
+@Mixin(PlayerEntity.class)
+public abstract class PlayerEntityTickMixin {
+    @Inject(at = @At("HEAD"), method = "tick()V")
+    public void onTick(CallbackInfo ci) {
+        PlayerTickEvent.EVENT.invoker().onTick((PlayerEntity) (Object) this);
     }
 }
