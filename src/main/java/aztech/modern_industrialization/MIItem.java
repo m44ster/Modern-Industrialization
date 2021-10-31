@@ -29,9 +29,11 @@ import aztech.modern_industrialization.items.GuideBookItem;
 import aztech.modern_industrialization.items.SteamDrillItem;
 import aztech.modern_industrialization.items.armor.GraviChestPlateItem;
 import aztech.modern_industrialization.items.armor.JetpackItem;
+import aztech.modern_industrialization.items.armor.QuantumArmorItem;
 import aztech.modern_industrialization.items.armor.RubberArmorMaterial;
 import aztech.modern_industrialization.items.diesel_tools.DieselToolItem;
 import aztech.modern_industrialization.items.tools.CrowbarItem;
+import aztech.modern_industrialization.items.tools.QuantumSword;
 import aztech.modern_industrialization.items.tools.WrenchItem;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -39,6 +41,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
@@ -67,20 +70,21 @@ public final class MIItem {
         return of(Item::new, id, maxCount, null, handheld);
     }
 
-    public static Item of(Function<Item.Settings, Item> ctor, String id, int maxCount) {
+    public static <T extends Item> T of(Function<? super FabricItemSettings, T> ctor, String id, int maxCount) {
         return of(ctor, id, maxCount, null);
     }
 
-    public static Item of(Function<Item.Settings, Item> ctor, String id, int maxCount, Consumer<Item> registrationEvent) {
+    public static <T extends Item> T of(Function<? super FabricItemSettings, T> ctor, String id, int maxCount, Consumer<Item> registrationEvent) {
         return of(ctor, id, maxCount, registrationEvent, false);
     }
 
-    public static Item of(Function<Item.Settings, Item> ctor, String id, int maxCount, boolean handheld) {
+    public static <T extends Item> T of(Function<? super FabricItemSettings, T> ctor, String id, int maxCount, boolean handheld) {
         return of(ctor, id, maxCount, null, false);
     }
 
-    public static Item of(Function<Item.Settings, Item> ctor, String id, int maxCount, Consumer<Item> registrationEvent, boolean handheld) {
-        Item item = ctor.apply(new Item.Settings().maxCount(maxCount).group(ModernIndustrialization.ITEM_GROUP));
+    public static <T extends Item> T of(Function<? super FabricItemSettings, T> ctor, String id, int maxCount, Consumer<Item> registrationEvent,
+            boolean handheld) {
+        T item = ctor.apply(new FabricItemSettings().maxCount(maxCount).group(ModernIndustrialization.ITEM_GROUP));
         if (items.put(id, item) != null) {
             throw new IllegalArgumentException("Item id already taken : " + id);
         }
@@ -164,21 +168,25 @@ public final class MIItem {
 
     public static final Item ITEM_SCREWDRIVER = of("screwdriver", 1, true);
     public static final Item ITEM_WRENCH = of(WrenchItem::new, "wrench", 1, true);
-    public static final JetpackItem ITEM_DIESEL_JETPACK = (JetpackItem) of(JetpackItem::new, "diesel_jetpack", 1,
+    public static final JetpackItem ITEM_DIESEL_JETPACK = of(JetpackItem::new, "diesel_jetpack", 1,
             (item) -> FluidStorage.ITEM.registerForItems((stack, ctx) -> new FluidFuelItemHelper.ItemStorage(JetpackItem.CAPACITY, ctx), item));
-    public static final DieselToolItem ITEM_DIESEL_CHAINSAW = (DieselToolItem) of(DieselToolItem::new, "diesel_chainsaw", 1,
+    public static final DieselToolItem ITEM_DIESEL_CHAINSAW = of(DieselToolItem::new, "diesel_chainsaw", 1,
             (item) -> FluidStorage.ITEM.registerForItems((stack, ctx) -> new FluidFuelItemHelper.ItemStorage(DieselToolItem.CAPACITY, ctx), item),
             true);
 
-    public static final DieselToolItem ITEM_DIESEL_MINING_DRILL = (DieselToolItem) of(DieselToolItem::new, "diesel_mining_drill", 1,
+    public static final DieselToolItem ITEM_DIESEL_MINING_DRILL = of(DieselToolItem::new, "diesel_mining_drill", 1,
             (item) -> FluidStorage.ITEM.registerForItems((stack, ctx) -> new FluidFuelItemHelper.ItemStorage(DieselToolItem.CAPACITY, ctx), item),
             true);
 
-    public static final SteamDrillItem ITEM_STEAM_MINING_DRILL = (SteamDrillItem) of(SteamDrillItem::new, "steam_mining_drill", 1, true);
+    public static final SteamDrillItem ITEM_STEAM_MINING_DRILL = of(SteamDrillItem::new, "steam_mining_drill", 1, true);
     public static final Item ITEM_CROWBAR = of(CrowbarItem::new, "crowbar", 1, true);
 
     public static final Item COOLING_CELL = of("cooling_cell");
 
-    public static final GraviChestPlateItem GRAVI_CHEST_PLATE = (GraviChestPlateItem) of(GraviChestPlateItem::new, "gravichestplate", 1);
-
+    public static final GraviChestPlateItem GRAVI_CHEST_PLATE = of(GraviChestPlateItem::new, "gravichestplate", 1);
+    public static final QuantumArmorItem QUANTUM_BOOTS = of(s -> new QuantumArmorItem(EquipmentSlot.FEET, s), "quantum_boots", 1);
+    public static final QuantumArmorItem QUANTUM_LEGGINGS = of(s -> new QuantumArmorItem(EquipmentSlot.LEGS, s), "quantum_leggings", 1);
+    public static final QuantumArmorItem QUANTUM_CHESTPLATE = of(s -> new QuantumArmorItem(EquipmentSlot.CHEST, s), "quantum_chestplate", 1);
+    public static final QuantumArmorItem QUANTUM_HELMET = of(s -> new QuantumArmorItem(EquipmentSlot.HEAD, s), "quantum_helmet", 1);
+    public static final QuantumSword QUANTUM_SWORD = of(QuantumSword::new, "quantum_sword", 1);
 }

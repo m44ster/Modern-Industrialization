@@ -23,14 +23,10 @@
  */
 package aztech.modern_industrialization.items.armor;
 
-import aztech.modern_industrialization.MIIdentifier;
 import aztech.modern_industrialization.api.energy.EnergyApi;
 import aztech.modern_industrialization.api.energy.EnergyExtractable;
-import aztech.modern_industrialization.mixin_impl.PlayerTickEvent;
 import aztech.modern_industrialization.util.Simulation;
 import aztech.modern_industrialization.util.TextHelper;
-import io.github.ladysnake.pal.AbilitySource;
-import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import java.util.List;
 import me.shedaniel.cloth.api.armor.v1.TickableArmor;
@@ -45,6 +41,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,49 +106,45 @@ public class GraviChestPlateItem extends ArmorItem implements Wearable, Tickable
         }
     }
 
-    private static final AbilitySource GCP_SOURCE = Pal.getAbilitySource(new MIIdentifier("gravichestplate"));
-    private static final long FLIGHT_COST = 1024;
+    public static final long FLIGHT_COST = 1024;
     public static final long ENERGY_CAPACITY = 1 << 24;
-
-    static {
-        PlayerTickEvent.EVENT.register(player -> {
-            if (player.world.isClient())
-                return;
-
-            ItemStack chest = player.getEquippedStack(EquipmentSlot.CHEST);
-
-            if (chest.getItem() instanceof GraviChestPlateItem gsp && gsp.isActivated(chest) && gsp.getEnergy(chest) > 0) {
-                GCP_SOURCE.grantTo(player, VanillaAbilities.ALLOW_FLYING);
-            } else {
-                GCP_SOURCE.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
-            }
-
-        });
-    }
 
     @Override
     public void tickArmor(ItemStack stack, PlayerEntity player) {
         if (player.world.isClient())
             return;
-        if (GCP_SOURCE.grants(player, VanillaAbilities.ALLOW_FLYING) && player.getAbilities().flying) {
+        if (MIArmorEffects.SRC.grants(player, VanillaAbilities.ALLOW_FLYING) && player.getAbilities().flying) {
             setEnergy(stack, Math.max(0, getEnergy(stack) - FLIGHT_COST));
         }
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        if (EnergyApi.MOVEABLE.find(context.getWorld(), context.getBlockPos(), context.getSide()) instanceof EnergyExtractable extractable) {
-            ItemStack stack = context.getStack();
-            long extracted = extractable.extractEnergy(ENERGY_CAPACITY - getEnergy(stack), Simulation.ACT);
-            setEnergy(stack, getEnergy(stack) + extracted);
-            return ActionResult.success(context.getWorld().isClient());
+        boolean didSomething = false;
+        for (Direction direction : Direction.values()) {
+            if (EnergyApi.MOVEABLE.find(context.getWorld(), context.getBlockPos(), context.getSide()) instanceof EnergyExtractable extractable) {
+                ItemStack stack = context.getStack();
+                long extracted = extractable.extractEnergy(ENERGY_CAPACITY - getEnergy(stack), Simulation.ACT);
+                setEnergy(stack, getEnergy(stack) + extracted);
+                didSomething = true;
+            }
         }
-        return ActionResult.PASS;
+        return didSomething ? ActionResult.success(context.getWorld().isClient()) : ActionResult.PASS;
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         tooltip.add(
                 new LiteralText(TextHelper.formatEu(getEnergy(stack)) + " / " + TextHelper.formatEu(ENERGY_CAPACITY)).setStyle(TextHelper.GRAY_TEXT));
+    }
+
+    @Override
+    public boolean isItemBarVisible(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public int getItemBarStep(ItemStack stack) {
+        return (int) Math.round(getEnergy(stack) / (double) ENERGY_CAPACITY * 13);
     }
 }

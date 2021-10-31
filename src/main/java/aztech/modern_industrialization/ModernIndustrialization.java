@@ -32,6 +32,7 @@ import aztech.modern_industrialization.compat.RecipeCompat;
 import aztech.modern_industrialization.inventory.ConfigurableInventoryPacketHandlers;
 import aztech.modern_industrialization.inventory.ConfigurableInventoryPackets;
 import aztech.modern_industrialization.items.armor.ArmorPackets;
+import aztech.modern_industrialization.items.armor.MIArmorEffects;
 import aztech.modern_industrialization.items.armor.MIKeyMap;
 import aztech.modern_industrialization.machines.MachinePackets;
 import aztech.modern_industrialization.machines.MachineScreenHandlers;
@@ -130,6 +131,7 @@ public class ModernIndustrialization implements ModInitializer {
         // setupMachines();
         setupPackets();
         setupFuels();
+        MIArmorEffects.init();
         RecipeCompat.loadCompatRecipes();
 
         MIPipes.INSTANCE.setup();
