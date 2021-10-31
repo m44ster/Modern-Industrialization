@@ -23,6 +23,8 @@
  */
 package aztech.modern_industrialization.machines.init;
 
+import static aztech.modern_industrialization.machines.multiblocks.HatchType.*;
+
 import aztech.modern_industrialization.MIBlock;
 import aztech.modern_industrialization.MIFluids;
 import aztech.modern_industrialization.api.FluidFuelRegistry;
@@ -53,8 +55,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static aztech.modern_industrialization.machines.models.MachineCasings.CLEAN_STAINLESS_STEEL;
-import static aztech.modern_industrialization.machines.multiblocks.HatchType.*;
-
+// @formatter:off
 @SuppressWarnings("rawtypes")
 public class MultiblockMachines {
     public static BlockEntityType COKE_OVEN;

@@ -21,29 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.machines.components;
+package aztech.modern_industrialization.util;
 
-import aztech.modern_industrialization.machines.IComponent;
-import aztech.modern_industrialization.machines.MachineBlockEntity;
-import net.minecraft.nbt.NbtCompound;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 
-public class IsActiveComponent implements IComponent.ClientOnly {
-    public boolean isActive = false;
+/**
+ * Version of {@link BlockApiCache} that will only query APIs if the target
+ * chunk is ticking.
+ */
+// TODO: consider PR'ing this to fabric
+public class MIBlockApiCache<A, C> {
+    public static <A, C> MIBlockApiCache<A, C> create(BlockApiLookup<A, C> lookup, ServerWorld world, BlockPos pos) {
+        return new MIBlockApiCache<>(lookup, world, pos);
+    }
 
-    public void updateActive(boolean newActive, MachineBlockEntity be) {
-        if (newActive != isActive) {
-            isActive = newActive;
-            be.sync(false);
+    private final BlockApiCache<A, C> cache;
+    private final ServerWorld world;
+    private final BlockPos pos;
+
+    private MIBlockApiCache(BlockApiLookup<A, C> lookup, ServerWorld world, BlockPos pos) {
+        this.cache = BlockApiCache.create(lookup, world, pos);
+        this.world = world;
+        this.pos = pos;
+    }
+
+    @Nullable
+    public A find(C context) {
+        if (world.method_37117(pos)) {
+            return cache.find(context);
         }
-    }
-
-    @Override
-    public void writeClientNbt(NbtCompound tag) {
-        tag.putBoolean("isActive", isActive);
-    }
-
-    @Override
-    public void readClientNbt(NbtCompound tag) {
-        isActive = tag.getBoolean("isActive");
+        return null;
     }
 }

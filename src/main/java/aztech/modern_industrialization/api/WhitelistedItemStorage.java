@@ -21,29 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.machines.components;
+package aztech.modern_industrialization.api;
 
-import aztech.modern_industrialization.machines.IComponent;
-import aztech.modern_industrialization.machines.MachineBlockEntity;
-import net.minecraft.nbt.NbtCompound;
+import java.util.Set;
+import net.minecraft.item.Item;
 
-public class IsActiveComponent implements IComponent.ClientOnly {
-    public boolean isActive = false;
+public interface WhitelistedItemStorage {
+    boolean currentlyWhitelisted();
 
-    public void updateActive(boolean newActive, MachineBlockEntity be) {
-        if (newActive != isActive) {
-            isActive = newActive;
-            be.sync(false);
-        }
-    }
-
-    @Override
-    public void writeClientNbt(NbtCompound tag) {
-        tag.putBoolean("isActive", isActive);
-    }
-
-    @Override
-    public void readClientNbt(NbtCompound tag) {
-        isActive = tag.getBoolean("isActive");
-    }
+    /**
+     * Write whitelisted items to the set.
+     */
+    void getWhitelistedItems(Set<Item> item);
 }
