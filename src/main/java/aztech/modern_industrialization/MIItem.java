@@ -46,6 +46,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
+import net.minecraft.util.Rarity;
 
 @SuppressWarnings("unused")
 public final class MIItem {
@@ -56,6 +57,14 @@ public final class MIItem {
 
     public static Item of(String id) {
         return of(Item::new, id, 64);
+    }
+
+    public static Item of(String id, Rarity rarity) {
+        return of(Item::new, id, 64, null, false, rarity);
+    }
+
+    public static Item of(String id, int maxCount, Rarity rarity) {
+        return of(Item::new, id, maxCount, null, false, rarity);
     }
 
     public static Item of(String id, Consumer<Item> registrationEvent) {
@@ -84,7 +93,12 @@ public final class MIItem {
 
     public static <T extends Item> T of(Function<? super FabricItemSettings, T> ctor, String id, int maxCount, Consumer<Item> registrationEvent,
             boolean handheld) {
-        T item = ctor.apply(new FabricItemSettings().maxCount(maxCount).group(ModernIndustrialization.ITEM_GROUP));
+        return of(ctor, id, maxCount, registrationEvent, handheld, Rarity.COMMON);
+    }
+
+    public static <T extends Item> T of(Function<? super FabricItemSettings, T> ctor, String id, int maxCount, Consumer<Item> registrationEvent,
+            boolean handheld, Rarity rarity) {
+        T item = ctor.apply(new FabricItemSettings().maxCount(maxCount).group(ModernIndustrialization.ITEM_GROUP).rarity(rarity));
         if (items.put(id, item) != null) {
             throw new IllegalArgumentException("Item id already taken : " + id);
         }
@@ -138,9 +152,9 @@ public final class MIItem {
     public static final Item ITEM_RANDOM_ACCESS_MEMORY = of("random_access_memory");
     public static final Item ITEM_MEMORY_MANAGEMENT_UNIT = of("memory_management_unit");
 
-    public static final Item ITEM_QUANTUM_CIRCUIT_BOARD = of("quantum_circuit_board");
-    public static final Item ITEM_QUANTUM_CIRCUIT = of("quantum_circuit");
-    public static final Item ITEM_QBIT = of("qbit");
+    public static final Item ITEM_QUANTUM_CIRCUIT_BOARD = of("quantum_circuit_board", Rarity.RARE);
+    public static final Item ITEM_QUANTUM_CIRCUIT = of("quantum_circuit", Rarity.RARE);
+    public static final Item ITEM_QBIT = of("qbit", Rarity.RARE);
 
     public static final Item ITEM_MONOCRYSTALLINE_SILICON = of("monocrystalline_silicon");
     public static final Item ITEM_SILICON_WAFER = of("silicon_wafer");
@@ -148,7 +162,7 @@ public final class MIItem {
     public static final Item BASIC_UPGRADE = of("basic_upgrade");
     public static final Item ADVANCED_UPGRADE = of("advanced_upgrade");
     public static final Item TURBO_UPGRADE = of("turbo_upgrade");
-    public static final Item HIGHLY_ADVANCED_UPGRADE = of("highly_advanced_upgrade");
+    public static final Item HIGHLY_ADVANCED_UPGRADE = of("highly_advanced_upgrade", Rarity.RARE);
 
     public static final Item ADVANCED_MOTOR = of("advanced_motor", (item) -> SpeedUpgrade.LOOKUP.registerForItems((key, vd) -> () -> 32, item));
     public static final Item LARGE_ADVANCED_MOTOR = of("large_advanced_motor",
@@ -163,11 +177,12 @@ public final class MIItem {
 
     public static final Item AIR_INTAKE = of("air_intake", 1);
 
-    public static final Item ITEM_PACKER_BLOCK_TEMPLATE = of("packer_block_template", 1);
-    public static final Item ITEM_PACKER_DOUBLE_INGOT_TEMPLATE = of("packer_double_ingot_template", 1);
+    public static final Item ITEM_PACKER_BLOCK_TEMPLATE = of("packer_block_template", 1, Rarity.RARE);
+    public static final Item ITEM_PACKER_DOUBLE_INGOT_TEMPLATE = of("packer_double_ingot_template", 1, Rarity.RARE);
 
     public static final Item ITEM_SCREWDRIVER = of("screwdriver", 1, true);
     public static final Item ITEM_WRENCH = of(WrenchItem::new, "wrench", 1, true);
+
     public static final JetpackItem ITEM_DIESEL_JETPACK = of(JetpackItem::new, "diesel_jetpack", 1,
             (item) -> FluidStorage.ITEM.registerForItems((stack, ctx) -> new FluidFuelItemHelper.ItemStorage(JetpackItem.CAPACITY, ctx), item));
     public static final DieselToolItem ITEM_DIESEL_CHAINSAW = of(DieselToolItem::new, "diesel_chainsaw", 1,
@@ -189,4 +204,7 @@ public final class MIItem {
     public static final QuantumArmorItem QUANTUM_CHESTPLATE = of(s -> new QuantumArmorItem(EquipmentSlot.CHEST, s), "quantum_chestplate", 1);
     public static final QuantumArmorItem QUANTUM_HELMET = of(s -> new QuantumArmorItem(EquipmentSlot.HEAD, s), "quantum_helmet", 1);
     public static final QuantumSword QUANTUM_SWORD = of(QuantumSword::new, "quantum_sword", 1);
+
+    public static final Item ULTRADENSE_METAL_BALL = of("ultradense_metal_ball");
+    public static final Item SINGULARITY = of("singularity", Rarity.EPIC);
 }
