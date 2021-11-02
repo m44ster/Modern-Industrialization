@@ -161,8 +161,9 @@ public final class MIItem {
 
     public static final Item BASIC_UPGRADE = of("basic_upgrade");
     public static final Item ADVANCED_UPGRADE = of("advanced_upgrade");
-    public static final Item TURBO_UPGRADE = of("turbo_upgrade");
+    public static final Item TURBO_UPGRADE = of("turbo_upgrade", Rarity.UNCOMMON);
     public static final Item HIGHLY_ADVANCED_UPGRADE = of("highly_advanced_upgrade", Rarity.RARE);
+    public static final Item QUANTUM_UPGRADE = of("quantum_upgrade", 1, Rarity.EPIC);
 
     public static final Item ADVANCED_MOTOR = of("advanced_motor", (item) -> SpeedUpgrade.LOOKUP.registerForItems((key, vd) -> () -> 32, item));
     public static final Item LARGE_ADVANCED_MOTOR = of("large_advanced_motor",
