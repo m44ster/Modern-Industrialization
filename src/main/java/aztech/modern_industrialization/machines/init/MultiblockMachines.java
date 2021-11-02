@@ -23,6 +23,7 @@
  */
 package aztech.modern_industrialization.machines.init;
 
+import static aztech.modern_industrialization.machines.models.MachineCasings.CLEAN_STAINLESS_STEEL;
 import static aztech.modern_industrialization.machines.multiblocks.HatchType.*;
 
 import aztech.modern_industrialization.MIBlock;
@@ -43,18 +44,16 @@ import aztech.modern_industrialization.machines.models.MachineModels;
 import aztech.modern_industrialization.machines.multiblocks.*;
 import aztech.modern_industrialization.machines.recipe.MachineRecipe;
 import aztech.modern_industrialization.machines.recipe.MachineRecipeType;
-import net.fabricmc.fabric.api.client.rendereregistry.v1.BlockEntityRendererRegistry;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.fluid.Fluid;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.fabricmc.fabric.api.client.rendereregistry.v1.BlockEntityRendererRegistry;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.fluid.Fluid;
 
-import static aztech.modern_industrialization.machines.models.MachineCasings.CLEAN_STAINLESS_STEEL;
 // @formatter:off
 @SuppressWarnings("rawtypes")
 public class MultiblockMachines {
@@ -457,7 +456,7 @@ public class MultiblockMachines {
 
         for (int y = -1; y <= 1; y++) {
 
-            int shape[][] = (y == 0) ? shapeCenter : shapeEdge;
+            int[][] shape = (y == 0) ? shapeCenter : shapeEdge;
 
             for (int i = 0; i < 7; i++) {
                 int x = i + 1;
@@ -474,7 +473,7 @@ public class MultiblockMachines {
                             fusionReactorShapeBuilder.add(-x, y, z, highlyAdvancedHull);
                             fusionReactorShapeBuilder.add(x, y, 14 - z, highlyAdvancedHull);
                             fusionReactorShapeBuilder.add(-x, y, 14 - z, highlyAdvancedHull);
-                        }else if(z >= z1 && z < z2) {
+                        }else if(z >= z1) {
                             fusionReactorShapeBuilder.add(x, y, z, fusionChamber);
                             fusionReactorShapeBuilder.add(-x, y, z, fusionChamber);
                             fusionReactorShapeBuilder.add(x, y, 14 - z, fusionChamber);
@@ -668,7 +667,7 @@ public class MultiblockMachines {
                 .items(inputs -> inputs.addSlots(36, 35, 2, 2), outputs -> outputs.addSlot(102, 42))
                 .register();
 
-        MachineModels.addTieredMachine("nuclear_reactor", "nuclear_reactor", MachineCasings.NUCLEAR, true, false, false, false);
+        MachineModels.addTieredMachine("nuclear_reactor", "nuclear_reactor", MachineCasings.NUCLEAR, true, false, false, true);
         BlockEntityRendererRegistry.INSTANCE.register(NUCLEAR_REACTOR, MultiblockMachineBER::new);
 
         MachineModels.addTieredMachine("large_tank",

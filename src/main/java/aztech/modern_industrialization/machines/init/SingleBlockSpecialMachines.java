@@ -69,6 +69,9 @@ public class SingleBlockSpecialMachines {
         MachineRegistrationHelper.registerMachine("configurable_chest", ConfigurableChestMachineBlockEntity::new,
                 MachineBlockEntity::registerItemApi);
 
+        MachineRegistrationHelper.registerMachine("replicator", ReplicatorMachineBlockEntity::new, MachineBlockEntity::registerFluidApi,
+                MachineBlockEntity::registerItemApi);
+
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             MachineModels.addTieredMachineTiers("water_pump", true, true, true, "bronze", "steel", "electric");
             MachineModels.addTieredMachine("bronze_boiler", "boiler", MachineCasings.BRICKED_BRONZE, true, false, false);
@@ -76,6 +79,8 @@ public class SingleBlockSpecialMachines {
             MachineModels.addTieredMachine("diesel_generator", "diesel_generator", MachineCasings.MV, true, true, true);
             MachineModels.addTieredMachine("turbo_diesel_generator", "diesel_generator", MachineCasings.HV, true, true, true);
             MachineModels.addTieredMachine("configurable_chest", "", MachineCasings.STEEL_CRATE, false, false, false, false);
+            MachineModels.addTieredMachine("replicator", "fusion_reactor", MachineCasings.SUPRACONDUCTOR, false, false, false, false);
+
         }
     }
 

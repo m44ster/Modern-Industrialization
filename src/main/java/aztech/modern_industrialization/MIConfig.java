@@ -60,6 +60,10 @@ public class MIConfig implements ConfigData {
     @ConfigEntry.BoundedDiscrete(min = 0, max = 20)
     public int steamDrillWaterUseFactor = 5;
 
+    public List<String> replicatorBlacklist = List.of("minecraft:command_block", "minecraft:repeating_command_block", "minecraft:chain_command_block",
+            "minecraft:barrier", "minecraft:light", "minecraft:structure_void", "minecraft:command_block_minecart", "minecraft:knowledge_book",
+            "minecraft:debug_stick", "modern_industrialization:bucket_uu_matter", "modern_industrialization:creative_tank");
+
     @ConfigEntry.Gui.Excluded
     private transient static boolean registered = false;
 
