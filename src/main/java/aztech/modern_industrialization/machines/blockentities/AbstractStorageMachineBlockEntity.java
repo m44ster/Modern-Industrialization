@@ -36,19 +36,16 @@ import aztech.modern_industrialization.machines.components.sync.EnergyBar;
 import aztech.modern_industrialization.machines.gui.MachineGuiParameters;
 import aztech.modern_industrialization.machines.helper.EnergyHelper;
 import aztech.modern_industrialization.machines.helper.OrientationHelper;
+import aztech.modern_industrialization.machines.models.MachineCasing;
+import aztech.modern_industrialization.machines.models.MachineCasings;
 import aztech.modern_industrialization.machines.models.MachineModelClientData;
 import aztech.modern_industrialization.util.Tickable;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction;
 
 public abstract class AbstractStorageMachineBlockEntity extends MachineBlockEntity implements Tickable {
 
-    protected final OrientationComponent orientation;
     protected final EnergyComponent energy;
 
     protected final EnergyInsertable insertable;
@@ -58,7 +55,7 @@ public abstract class AbstractStorageMachineBlockEntity extends MachineBlockEnti
     protected final CableTier from, to;
 
     public AbstractStorageMachineBlockEntity(BEP bep, CableTier from, CableTier to, String name, long eu_capacity) {
-        super(bep, new MachineGuiParameters.Builder(name, false).build());
+        super(bep, new MachineGuiParameters.Builder(name, false).build(), new OrientationComponent.Params(true, false, false));
 
         this.from = from;
         this.to = to;
@@ -70,8 +67,7 @@ public abstract class AbstractStorageMachineBlockEntity extends MachineBlockEnti
         EnergyBar.Parameters energyBarParams = new EnergyBar.Parameters(76, 39);
         registerClientComponent(new EnergyBar.Server(energyBarParams, energy::getEu, energy::getCapacity));
 
-        this.orientation = new OrientationComponent(new OrientationComponent.Params(true, false, false));
-        this.registerComponents(orientation, energy);
+        this.registerComponents(energy);
 
     }
 
@@ -80,9 +76,9 @@ public abstract class AbstractStorageMachineBlockEntity extends MachineBlockEnti
         return MIInventory.EMPTY;
     }
 
-    @Override
-    protected ActionResult onUse(PlayerEntity player, Hand hand, Direction face) {
-        return OrientationHelper.onUse(player, hand, face, orientation, this);
+
+    public static MachineCasing getCasingFromTier(CableTier from, CableTier to) {
+        return MachineCasings.casingFromCableTier(from.eu > to.eu ? from : to);
     }
 
     @Override

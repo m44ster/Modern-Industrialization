@@ -21,28 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.mixin.client;
+package aztech.modern_industrialization.api;
 
-import aztech.modern_industrialization.mixin_impl.MITooltipComponents;
-import java.util.List;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.item.TooltipData;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 
-@Mixin(Screen.class)
-public class ScreenMixin {
-    // Synthetic lambda body in renderTooltip
-    @Inject(at = @At("HEAD"), method = "method_32635(Ljava/util/List;Lnet/minecraft/client/item/TooltipData;)V", cancellable = true)
-    private static void injectRenderTooltipLambda(List<TooltipComponent> components, TooltipData data, CallbackInfo ci) {
-        TooltipComponent component = MITooltipComponents.of(data);
-
-        if (component != null) {
-            components.add(1, component);
-            ci.cancel();
-        }
-    }
+public interface ICacheableApiHost {
+    /**
+     * Return true if the host allows caching the API, in which case it will notify
+     * the callback when the API changes.
+     */
+    <A, C> boolean canCache(BlockApiLookup<A, C> lookup, A apiInstance, Runnable invalidateCallback);
 }

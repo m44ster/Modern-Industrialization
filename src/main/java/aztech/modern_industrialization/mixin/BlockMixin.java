@@ -21,24 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.api;
+package aztech.modern_industrialization.mixin;
 
-import aztech.modern_industrialization.util.Tickable;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+import aztech.modern_industrialization.MIConfig;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-public interface TickableBlock extends BlockEntityProvider {
-    @Override
-    default @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return (w, p, s, be) -> {
-            if (be instanceof Tickable) {
-                ((Tickable) be).tick();
+/**
+ * Color water and lava blocks if enabled in the config.
+ */
+@Mixin(Block.class)
+public class BlockMixin {
+    @Inject(at = @At("RETURN"), method = "getName")
+    public void changeFluidColor(CallbackInfoReturnable<MutableText> cir) {
+        if (MIConfig.getConfig().colorWaterLava) {
+            Block self = Block.class.cast(this);
+
+            if (self == Blocks.WATER) {
+                cir.getReturnValue().setStyle(Style.EMPTY.withColor(Formatting.BLUE));
+            } else if (self == Blocks.LAVA) {
+                cir.getReturnValue().setStyle(Style.EMPTY.withColor(Formatting.RED));
             }
-        };
+        }
     }
 }

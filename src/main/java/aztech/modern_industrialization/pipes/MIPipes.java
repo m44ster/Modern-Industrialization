@@ -43,7 +43,6 @@ import aztech.modern_industrialization.util.ResourceUtil;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -58,7 +57,6 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.item.Item;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -112,18 +110,11 @@ public class MIPipes {
         Registry.register(Registry.BLOCK, new MIIdentifier("pipe"), BLOCK_PIPE);
         BLOCK_ENTITY_TYPE_PIPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, new MIIdentifier("pipe"),
                 FabricBlockEntityTypeBuilder.create(PipeBlockEntity::new, BLOCK_PIPE).build(null));
-        ResourceUtil.appendWrenchable(new MIIdentifier("pipe"));
 
         for (PipeColor color : PipeColor.values()) {
             registerFluidPipeType(color);
             registerItemPipeType(color);
         }
-
-        ServerTickEvents.START_SERVER_TICK.register(server -> {
-            for (ServerWorld world : server.getWorlds()) {
-                PipeNetworks.get(world).onServerTickStart();
-            }
-        });
 
         registerPackets();
     }

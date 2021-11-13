@@ -53,12 +53,7 @@ public class MIConfig implements ConfigData {
     public boolean disableFuelTooltips = false;
     public boolean disableItemTagTooltips = false;
     public boolean newVersionMessage = true;
-
-    @ConfigEntry.BoundedDiscrete(min = 0, max = 20)
-    public int steamDrillFuelUseFactor = 5;
-
-    @ConfigEntry.BoundedDiscrete(min = 0, max = 20)
-    public int steamDrillWaterUseFactor = 5;
+    public boolean colorWaterLava = true;
 
     public List<String> replicatorBlacklist = List.of("minecraft:command_block", "minecraft:repeating_command_block", "minecraft:chain_command_block",
             "minecraft:barrier", "minecraft:light", "minecraft:structure_void", "minecraft:command_block_minecart", "minecraft:knowledge_book",

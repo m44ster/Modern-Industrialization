@@ -21,20 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.mixin_impl;
+package aztech.modern_industrialization.items;
 
-import aztech.modern_industrialization.blocks.storage.barrel.BarrelTooltipData;
-import aztech.modern_industrialization.blocks.storage.barrel.client.BarrelTooltipComponent;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.item.TooltipData;
-import org.jetbrains.annotations.Nullable;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+import java.util.UUID;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 
-public class MITooltipComponents {
-    @Nullable
-    public static TooltipComponent of(TooltipData data) {
-        if (data instanceof BarrelTooltipData barrelData) {
-            return new BarrelTooltipComponent(barrelData);
-        }
-        return null;
+public final class ItemHelper {
+    private static final UUID TOOL_UUID = UUID.randomUUID();
+
+    public static Multimap<EntityAttribute, EntityAttributeModifier> createToolModifiers(double damage) {
+        return ImmutableMultimap.of(EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                new EntityAttributeModifier(TOOL_UUID, "MI Diesel Tool Item", damage, EntityAttributeModifier.Operation.ADDITION));
+    }
+
+    private ItemHelper() {
     }
 }

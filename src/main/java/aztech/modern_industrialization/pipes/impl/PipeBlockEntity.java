@@ -26,12 +26,12 @@ package aztech.modern_industrialization.pipes.impl;
 import static net.minecraft.util.math.Direction.NORTH;
 
 import aztech.modern_industrialization.api.FastBlockEntity;
+import aztech.modern_industrialization.api.WrenchableBlockEntity;
 import aztech.modern_industrialization.pipes.MIPipes;
 import aztech.modern_industrialization.pipes.api.*;
 import aztech.modern_industrialization.pipes.gui.IPipeScreenHandlerHelper;
 import aztech.modern_industrialization.util.NbtHelper;
 import aztech.modern_industrialization.util.RenderHelper;
-import aztech.modern_industrialization.util.Tickable;
 import java.util.*;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
@@ -43,8 +43,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -55,7 +57,7 @@ import net.minecraft.util.shape.VoxelShapes;
  */
 // TODO: add isClient checks wherever it is necessary
 public class PipeBlockEntity extends FastBlockEntity
-        implements IPipeScreenHandlerHelper, Tickable, BlockEntityClientSerializable, RenderAttachmentBlockEntity {
+        implements IPipeScreenHandlerHelper, BlockEntityClientSerializable, RenderAttachmentBlockEntity, WrenchableBlockEntity {
     private static final int MAX_PIPES = 3;
     private static final VoxelShape[][][] SHAPE_CACHE;
     static final VoxelShape DEFAULT_SHAPE;
@@ -85,7 +87,7 @@ public class PipeBlockEntity extends FastBlockEntity
      */
     boolean stateReplaced = false;
 
-    private void loadPipes() {
+    public void loadPipes() {
         if (world.isClient)
             return;
 
@@ -277,15 +279,8 @@ public class PipeBlockEntity extends FastBlockEntity
     }
 
     @Override
-    public void tick() {
-        loadPipes();
-        for (PipeNetworkNode pipe : pipes) {
-            pipe.tick(world, pos);
-            if (pipe.shouldSync()) {
-                sync();
-            }
-        }
-        markDirty();
+    public void cancelRemoval() {
+        PipeNetworks.scheduleLoadPipe(world, this);
     }
 
     public void onConnectionsChanged() {
@@ -371,6 +366,11 @@ public class PipeBlockEntity extends FastBlockEntity
     @Override
     public boolean doesNodeStillExist(PipeNetworkNode node) {
         return pipes.contains(node);
+    }
+
+    @Override
+    public boolean useWrench(PlayerEntity player, Hand hand, BlockHitResult hitResult) {
+        return PipeBlock.useWrench(this, player, hand, hitResult);
     }
 
     static class RenderAttachment {

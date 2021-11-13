@@ -4,7 +4,8 @@
   "package": "aztech.modern_industrialization.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "IngredientMixin",
+    "BlockApiCacheAccessor",
+    "BlockMixin",
     "ItemStackMixin",
     "LivingEntityElytraMixin",
     "LivingEntityMixin",
@@ -23,8 +24,7 @@
     "client.ClientPlayerEntityMixin",
     "client.ClientPlayerInteractionManagerMixin",
     "client.HandledScreenAccessor",
-    "client.HeldItemRendererMixin",
-    "client.ScreenMixin"
+    "client.HeldItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

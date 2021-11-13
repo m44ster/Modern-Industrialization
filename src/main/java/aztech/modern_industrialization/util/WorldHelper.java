@@ -21,10 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.mixin_impl;
+package aztech.modern_industrialization.util;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 
-public interface IngredientMatchingStacksAccessor {
-    ItemStack[] modern_industrialization_getMatchingStacks();
+public class WorldHelper {
+    public static boolean isChunkTicking(ServerWorld world, long packedChunkPos) {
+        return world.getChunkManager().isTickingFutureReady(packedChunkPos) && world.method_37116(packedChunkPos);
+    }
 }

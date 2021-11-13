@@ -26,7 +26,6 @@ package aztech.modern_industrialization.pipes.item;
 import aztech.modern_industrialization.api.WhitelistedItemStorage;
 import aztech.modern_industrialization.pipes.api.PipeNetwork;
 import aztech.modern_industrialization.pipes.api.PipeNetworkData;
-import aztech.modern_industrialization.pipes.api.PipeNetworkNode;
 import aztech.modern_industrialization.util.MIBlockApiCache;
 import aztech.modern_industrialization.util.StorageUtil2;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -47,77 +46,86 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class ItemNetwork extends PipeNetwork {
     private static final ReferenceOpenHashSet<Item> WHITELIST_CACHED_SET = new ReferenceOpenHashSet<>();
+
+    private int inactiveTicks = 0;
 
     public ItemNetwork(int id, PipeNetworkData data) {
         super(id, data == null ? new ItemNetworkData() : data);
     }
 
     @Override
-    public void tick(World world) {
+    public void tick(ServerWorld world) {
         // Only tick once
-        if (ticked)
-            return;
-        ticked = true;
+        if (inactiveTicks == 0) {
+            doNetworkTransfer(world);
+            inactiveTicks = 60;
+        }
+        --inactiveTicks;
+    }
 
-        Storage<ItemVariant> insertTargets = null;
+    private void doNetworkTransfer(ServerWorld world) {
+        List<ExtractionTarget> extractionTargets = new ArrayList<>();
+        for (var entry : iterateTickingNodes()) {
+            BlockPos pos = entry.getPos();
+            ItemNetworkNode itemNode = (ItemNetworkNode) entry.getNode();
+            for (ItemNetworkNode.ItemConnection connection : itemNode.connections) {
+                if (connection.canExtract()) {
+                    Storage<ItemVariant> source = ItemStorage.SIDED.find(world, pos.offset(connection.direction), connection.direction.getOpposite());
 
-        try (Transaction tx = Transaction.openOuter()) {
-            for (Map.Entry<BlockPos, PipeNetworkNode> entry : nodes.entrySet()) {
-                if (entry.getValue() != null) {
-                    BlockPos pos = entry.getKey();
-                    ItemNetworkNode itemNode = (ItemNetworkNode) entry.getValue();
-                    if (itemNode.inactiveTicks == 0) {
-                        for (ItemNetworkNode.ItemConnection connection : itemNode.connections) {
-                            if (connection.canExtract()) {
-                                Storage<ItemVariant> source = ItemStorage.SIDED.find(world, pos.offset(connection.direction),
-                                        connection.direction.getOpposite());
-
-                                if (insertTargets == null) {
-                                    insertTargets = getAggregateInsertTarget(world);
-                                }
-
-                                StorageUtil.move(source, insertTargets, connection::canStackMoveThrough, connection.getMoves(), tx);
-                            }
-                        }
-                        itemNode.inactiveTicks = 60;
+                    if (source != null) {
+                        extractionTargets.add(new ExtractionTarget(connection, source));
                     }
-                    itemNode.inactiveTicks--;
                 }
             }
+        }
+        // Lower priority extracts first.
+        extractionTargets.sort(Comparator.comparing(et -> et.connection.priority));
 
+        // Do the actual transfer.
+        Storage<ItemVariant> insertTargets = getAggregateInsertTarget(world);
+        try (Transaction tx = Transaction.openOuter()) {
+            for (ExtractionTarget target : extractionTargets) {
+                StorageUtil.move(target.storage, insertTargets, target.connection::canStackMoveThrough, target.connection.getMoves(), tx);
+            }
             tx.commit();
+        }
+    }
+
+    private static class ExtractionTarget {
+        private final ItemNetworkNode.ItemConnection connection;
+        private final Storage<ItemVariant> storage;
+
+        private ExtractionTarget(ItemNetworkNode.ItemConnection connection, Storage<ItemVariant> storage) {
+            this.connection = connection;
+            this.storage = storage;
         }
     }
 
     /**
      * Find all connections in which to insert that are loaded.
      */
-    public Storage<ItemVariant> getAggregateInsertTarget(World world) {
+    private Storage<ItemVariant> getAggregateInsertTarget(ServerWorld world) {
         Int2ObjectMap<PriorityBucket> priorityBuckets = new Int2ObjectOpenHashMap<>();
 
-        for (Map.Entry<BlockPos, PipeNetworkNode> entry : nodes.entrySet()) {
-            if (entry.getValue() != null) {
-                ItemNetworkNode node = (ItemNetworkNode) entry.getValue();
-                for (ItemNetworkNode.ItemConnection connection : node.connections) {
-                    if (connection.canInsert()) {
-                        if (connection.cache == null) {
-                            connection.cache = MIBlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world,
-                                    entry.getKey().offset(connection.direction));
-                        }
-                        Storage<ItemVariant> target = connection.cache.find(connection.direction.getOpposite());
-                        if (target != null && target.supportsInsertion()) {
-                            PriorityBucket bucket = priorityBuckets.computeIfAbsent(connection.priority, PriorityBucket::new);
-                            InsertTarget it = new InsertTarget(connection, StorageUtil2.wrapInventory(target));
+        for (var entry : iterateTickingNodes()) {
+            ItemNetworkNode node = (ItemNetworkNode) entry.getNode();
+            for (ItemNetworkNode.ItemConnection connection : node.connections) {
+                if (connection.canInsert()) {
+                    if (connection.cache == null) {
+                        connection.cache = MIBlockApiCache.create(ItemStorage.SIDED, world, entry.getPos().offset(connection.direction));
+                    }
+                    Storage<ItemVariant> target = connection.cache.find(connection.direction.getOpposite());
+                    if (target != null && target.supportsInsertion()) {
+                        PriorityBucket bucket = priorityBuckets.computeIfAbsent(connection.priority, PriorityBucket::new);
+                        InsertTarget it = new InsertTarget(connection, StorageUtil2.wrapInventory(target));
 
-                            if (connection.whitelist || (target instanceof WhitelistedItemStorage wis && wis.currentlyWhitelisted())) {
-                                bucket.whitelist.add(it);
-                            } else {
-                                bucket.blacklist.add(it);
-                            }
+                        if (connection.whitelist || (target instanceof WhitelistedItemStorage wis && wis.currentlyWhitelisted())) {
+                            bucket.whitelist.add(it);
+                        } else {
+                            bucket.blacklist.add(it);
                         }
                     }
                 }

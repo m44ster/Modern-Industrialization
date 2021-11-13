@@ -21,25 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.mixin;
+package aztech.modern_industrialization.api;
 
-import aztech.modern_industrialization.mixin_impl.IngredientMatchingStacksAccessor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 
-@Mixin(Ingredient.class)
-public abstract class IngredientMixin implements IngredientMatchingStacksAccessor {
-    @Shadow
-    private ItemStack[] matchingStacks;
-
-    @Shadow
-    protected abstract void cacheMatchingStacks();
-
-    @Override
-    public ItemStack[] modern_industrialization_getMatchingStacks() {
-        this.cacheMatchingStacks();
-        return this.matchingStacks;
-    }
+public interface WrenchableBlockEntity {
+    boolean useWrench(PlayerEntity player, Hand hand, BlockHitResult hitResult);
 }
