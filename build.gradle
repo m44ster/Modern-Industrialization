@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'com.diffplug.spotless' version '5.14.0'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
-    id "com.modrinth.minotaur" version "1.2.1"
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 apply plugin: 'java-library'
@@ -402,19 +402,24 @@ if (System.getenv("CURSEFORGE_API_KEY") && !version.endsWith("-SNAPSHOT")) {
     }
 }
 
-import com.modrinth.minotaur.TaskModrinthUpload
-
-task publishModrinth (type: TaskModrinthUpload){
-    onlyIf {
-        System.getenv("MODRINTH_API_KEY") && !version.endsWith("-SNAPSHOT")
+import com.modrinth.minotaur.dependencies.ModDependency
+if (System.getenv("MODRINTH_API_KEY") && !version.endsWith("-SNAPSHOT")) {
+    modrinth {
+        token = System.getenv("MODRINTH_API_KEY")
+        projectId = project.modrinth_project
+        versionNumber = version
+        versionName = "Modern Industrialization v${version}"
+        delegate.changelog = changelog
+        versionType = releaseChannel
+        uploadFile = remapJar.archiveFile
+        gameVersions = ["1.18.2"]
+        loaders = ["fabric"]
+        dependencies = [
+            new ModDependency("P7dR8mSH", "required"), // Fabric API
+            new ModDependency("9s6osm5g", "required"), // Cloth Config
+            new ModDependency("6AQIaxuO", "optional") // WTHIT
+            //TODO: add REI when its released on modrinth
+        ]
     }
-    token = System.getenv("MODRINTH_API_KEY")
-    projectId = project.modrinth_project
-    versionNumber = version
-    versionName = "Modern Industrialization v${version}"
-    delegate.changelog = changelog
-    versionType = releaseChannel.toUpperCase()
-    uploadFile = remapJar.archiveFile
-    addGameVersion "1.18.2"
-    addLoader "fabric"
 }
+
