@@ -41,6 +41,7 @@ import aztech.modern_industrialization.misc.autotest.MIAutoTesting;
 import aztech.modern_industrialization.misc.guidebook.GuidebookEvents;
 import aztech.modern_industrialization.nuclear.NuclearItem;
 import aztech.modern_industrialization.pipes.MIPipes;
+import aztech.modern_industrialization.proxy.CommonProxy;
 import java.util.Map;
 import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
@@ -122,7 +123,7 @@ public class ModernIndustrialization implements ModInitializer {
 
         MIPipes.INSTANCE.setup();
 
-        RRPCallback.EVENT.register(a -> {
+        RRPCallback.BEFORE_VANILLA.register(a -> {
             a.add(RESOURCE_PACK);
         });
 
@@ -132,6 +133,8 @@ public class ModernIndustrialization implements ModInitializer {
             MIKeyMap.clear(handler.player);
         });
         GuidebookEvents.init();
+
+        CommonProxy.initEvents();
 
         if (System.getProperty("modern_industrialization.autoTest") != null) {
             MIAutoTesting.init();
@@ -262,15 +265,14 @@ public class ModernIndustrialization implements ModInitializer {
         FluidFuelRegistry.register(MIFluids.HYDROGEN, 1);
         FluidFuelRegistry.register(MIFluids.DEUTERIUM, 1);
         FluidFuelRegistry.register(MIFluids.TRITIUM, 1);
-        FluidFuelRegistry.register(MIFluids.CRUDE_OIL, 8);
-        FluidFuelRegistry.register(MIFluids.SYNTHETIC_OIL, 8);
-        FluidFuelRegistry.register(MIFluids.NAPHTHA, 40);
-        FluidFuelRegistry.register(MIFluids.CREOSOTE, 80);
-        FluidFuelRegistry.register(MIFluids.LIGHT_FUEL, 80);
-        FluidFuelRegistry.register(MIFluids.HEAVY_FUEL, 120);
-        FluidFuelRegistry.register(MIFluids.DIESEL, 200);
-        FluidFuelRegistry.register(MIFluids.BOOSTED_DIESEL, 400);
-
+        FluidFuelRegistry.register(MIFluids.CRUDE_OIL, 16);
+        FluidFuelRegistry.register(MIFluids.SYNTHETIC_OIL, 16);
+        FluidFuelRegistry.register(MIFluids.NAPHTHA, 80);
+        FluidFuelRegistry.register(MIFluids.CREOSOTE, 160);
+        FluidFuelRegistry.register(MIFluids.LIGHT_FUEL, 160);
+        FluidFuelRegistry.register(MIFluids.HEAVY_FUEL, 240);
+        FluidFuelRegistry.register(MIFluids.DIESEL, 400);
+        FluidFuelRegistry.register(MIFluids.BOOSTED_DIESEL, 800);
     }
 
     private void setupWrench() {

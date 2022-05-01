@@ -21,24 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package aztech.modern_industrialization.blocks.storage.tank;
+package aztech.modern_industrialization.datagen.tag;
 
-import aztech.modern_industrialization.MIBlockEntityTypes;
-import aztech.modern_industrialization.MIIdentifier;
-import aztech.modern_industrialization.blocks.creativetank.CreativeTankRenderer;
-import aztech.modern_industrialization.machines.models.MachineModelProvider;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
-import net.minecraft.client.resources.model.UnbakedModel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 
-@Environment(EnvType.CLIENT)
-public class CreativeTankClientSetup {
-    public static void setupClient() {
-        UnbakedModel creativeTankModel = new TankModel("creative");
-        MachineModelProvider.register(new MIIdentifier("block/creative_tank"), creativeTankModel);
-        MachineModelProvider.register(new MIIdentifier("item/creative_tank"), creativeTankModel);
+public class TagsToGenerate {
+    static final Map<String, List<Item>> tagToItemMap = new HashMap<>();
 
-        BlockEntityRendererRegistry.register(MIBlockEntityTypes.CREATIVE_TANK, CreativeTankRenderer::new);
+    public static void generateTag(String tag, Item item) {
+        if (tag.startsWith("#")) {
+            throw new IllegalArgumentException("Tag must not start with #: " + tag);
+        }
+        tagToItemMap.computeIfAbsent(tag, t -> new ArrayList<>()).add(item);
+    }
+
+    public static void generateTag(String tag, String item) {
+        generateTag(tag, Registry.ITEM.get(new ResourceLocation(item)));
+    }
+
+    public static void generateTag(TagKey<Item> tag, Item item) {
+        generateTag(tag.location().toString(), item);
     }
 }
