@@ -23,13 +23,6 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    // for ARRP
-    maven {
-        url = "https://storage.googleapis.com/devan-maven/"
-        content {
-            includeGroup "net.devtech"
-        }
-    }
     // for Patchouli
     maven {
         url 'https://maven.blamejared.com'
@@ -144,6 +137,9 @@ repositories {
 }
 
 dependencies {
+    // TODO: remove when it's included in prod builds
+    include modImplementation("net.fabricmc.fabric-api:fabric-data-generation-api-v1:2.0.9+e19de87d60")
+
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.layered() {
         officialMojangMappings()
@@ -153,9 +149,6 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Dependencies
-    include modImplementation("net.devtech:arrp:${project.arrp_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
 
     modImplementation("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") {
         exclude(group: "net.fabricmc.fabric-api")
@@ -176,7 +169,7 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modImplementation("dev.latvian.mods:kubejs-fabric:1802.5.0-build.312") {
+    modCompileOnly("dev.latvian.mods:kubejs-fabric:1802.5.0-build.312") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
@@ -259,6 +252,7 @@ loom {
             name "Data Generation"
             vmArg "-Dfabric-api.datagen"
             vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+            vmArg "-Dfabric-api.datagen.strict-validation=true"
 
             ideConfigGenerated = true
             runDir "build/datagen"
@@ -325,7 +319,7 @@ spotless {
         licenseHeaderFile 'LICENSE.java'
     }
     format 'json', {
-        target 'src/**/lang/*.json'
+        target 'src/main/**/lang/*.json'
         addStep(JsonOrderStep.create())
     }
 }

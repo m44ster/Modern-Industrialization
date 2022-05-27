@@ -23,52 +23,87 @@
  */
 package aztech.modern_industrialization.materials.part;
 
-import static aztech.modern_industrialization.ModernIndustrialization.ITEM_GROUP;
-
 import aztech.modern_industrialization.MIBlock;
+import aztech.modern_industrialization.MIIdentifier;
 import aztech.modern_industrialization.MITags;
 import aztech.modern_industrialization.blocks.storage.tank.*;
 import aztech.modern_industrialization.datagen.tag.TagsToGenerate;
+import aztech.modern_industrialization.definition.BlockDefinition;
 import aztech.modern_industrialization.proxy.CommonProxy;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.core.Registry;
-import net.minecraft.world.item.Item;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.data.models.model.ModelTemplate;
+import net.minecraft.data.models.model.TextureMapping;
+import net.minecraft.data.models.model.TextureSlot;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 public class TankPart extends UnbuildablePart<Long> {
+    public static final BiConsumer<Block, BlockModelGenerators> MODEL_GENERATOR = (block, gen) -> {
+        var textureSlot = TextureSlot.create("0");
+        var mapping = TextureMapping.singleSlot(textureSlot, new MIIdentifier("block/" + Registry.BLOCK.getKey(block).getPath()));
+        gen.skipAutoItemBlock(block);
+        gen.createTrivialBlock(block, mapping, new ModelTemplate(Optional.of(new MIIdentifier("base/tank")), Optional.empty(), textureSlot));
+    };
 
     public TankPart() {
         super("tank");
     }
 
     public RegularPart of(int bucketCapacity) {
-        return of((long) bucketCapacity);
+        return of("Tank", (long) bucketCapacity);
+    }
+
+    public RegularPart of(String englishNameFormatter, int bucketCapacity) {
+        return of(englishNameFormatter, (long) bucketCapacity);
     }
 
     @Override
     public RegularPart of(Long bucketCapacity) {
+        return of("Tank", bucketCapacity);
+    }
+
+    public RegularPart of(String englishNameFormatter, Long bucketCapacity) {
         MutableObject<BlockEntityType<BlockEntity>> bet = new MutableObject<>();
         long capacity = FluidConstants.BUCKET * bucketCapacity;
 
-        return new RegularPart(key).withoutTextureRegister().withRegister((registeringContext, partContext, part, itemPath, itemId, itemTag) -> {
-            EntityBlock factory = (pos, state) -> new TankBlockEntity(bet.getValue(), pos, state, capacity);
-            TankBlock block = new TankBlock(itemPath, (MIBlock b) -> new TankItem(b, new Item.Properties().tab(ITEM_GROUP), capacity), factory);
-            TankItem item = (TankItem) block.blockItem;
-            TagsToGenerate.generateTag(MITags.TANKS, item);
+        return new RegularPart(englishNameFormatter, key)
+                .asBlock()
+                .withRegister((registeringContext, partContext, part, itemPath, itemId, itemTag) -> {
+                    EntityBlock factory = (pos, state) -> new TankBlockEntity(bet.getValue(), pos, state, capacity);
 
-            bet.setValue(Registry.register(Registry.BLOCK_ENTITY_TYPE, itemId,
-                    FabricBlockEntityTypeBuilder.create(block.factory::newBlockEntity, block).build(null)));
+                    String englishName = RegularPart.getEnglishName(englishNameFormatter, partContext.getEnglishName());
 
-            // Fluid API
-            FluidStorage.SIDED.registerSelf(bet.getValue());
-            item.registerItemApi();
-        }).withClientRegister((registeringContext, partContext, part, itemPath, itemId, itemTag) -> {
-            CommonProxy.INSTANCE.registerPartTankClient(partContext, itemPath, bet.getValue());
-        });
+                    BlockDefinition<TankBlock> blockDefinition = MIBlock.block(
+                            englishName,
+                            itemPath,
+                            MIBlock.BlockDefinitionParams.of().withBlockConstructor(
+                                    s -> new TankBlock(factory)).withBlockItemConstructor(
+                                            (b, s) -> new TankItem(b, capacity))
+                                    .withModel(MODEL_GENERATOR)
+                                    .noLootTable());
+
+                    TankBlock block = blockDefinition.asBlock();
+                    TankItem item = (TankItem) blockDefinition.asItem();
+
+                    TagsToGenerate.generateTag(MITags.TANKS, item);
+
+                    bet.setValue(Registry.register(Registry.BLOCK_ENTITY_TYPE, itemId,
+                            FabricBlockEntityTypeBuilder.create(block.factory::newBlockEntity, block).build(null)));
+
+                    // Fluid API
+                    FluidStorage.SIDED.registerSelf(bet.getValue());
+                    item.registerItemApi();
+
+                    CommonProxy.INSTANCE.registerPartTankClient(block, partContext.getMaterialName(), itemPath, bet.getValue());
+                });
     }
 }

@@ -24,13 +24,14 @@
 package aztech.modern_industrialization.datagen.tag;
 
 import aztech.modern_industrialization.MIBlock;
+import aztech.modern_industrialization.MIIdentifier;
+import aztech.modern_industrialization.definition.BlockDefinition;
+import aztech.modern_industrialization.pipes.MIPipes;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
 
 public class MIBlockTagProvider extends FabricTagProvider.BlockTagProvider {
     public MIBlockTagProvider(FabricDataGenerator dataGenerator) {
@@ -39,22 +40,15 @@ public class MIBlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
     @Override
     protected void generateTags() {
-        for (var block : MIBlock.blocks.values()) {
-            if (block.isPickaxeMineable()) {
-                tag(BlockTags.MINEABLE_WITH_PICKAXE).add(block);
-            }
-            if (block.getMiningLevel() > 0) {
-                tag(getMiningLevelTag(block.getMiningLevel())).add(block);
+        for (BlockDefinition<?> definition : MIBlock.BLOCKS.values()) {
+            for (var tag : definition.tags) {
+                tag(tag).add(definition.asBlock());
             }
         }
+
+        tag(BlockTags.MINEABLE_WITH_PICKAXE).add(MIPipes.BLOCK_PIPE);
+        tag(ConventionalBlockTags.QUARTZ_ORES).add(Registry.BLOCK.get(new MIIdentifier("quartz_ore"))); // Have no idea why there is such a tag but go
+                                                                                                        // add it
     }
 
-    private static TagKey<Block> getMiningLevelTag(int level) {
-        return switch (level) {
-        case 1 -> BlockTags.NEEDS_STONE_TOOL;
-        case 2 -> BlockTags.NEEDS_IRON_TOOL;
-        case 3 -> BlockTags.NEEDS_DIAMOND_TOOL;
-        default -> TagKey.create(Registry.BLOCK.key(), new ResourceLocation("fabric", "needs_tool_level_" + level));
-        };
-    }
 }
