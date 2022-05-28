@@ -423,4 +423,3 @@ if (System.getenv("MODRINTH_API_KEY") && !version.endsWith("-SNAPSHOT")) {
         }
     }
 }
-
