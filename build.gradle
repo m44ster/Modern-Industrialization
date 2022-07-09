@@ -2,8 +2,9 @@ plugins {
     id 'fabric-loom' version '0.12-SNAPSHOT'
     id 'maven-publish'
     id 'com.diffplug.spotless' version '5.14.0'
+    id "me.shedaniel.unified-publishing" version "0.1.+"
     id 'com.matthewprenger.cursegradle' version '1.4.0'
-    id "com.modrinth.minotaur" version "1.2.1"
+    // id "com.modrinth.minotaur" version "1.2.1"
 }
 
 apply plugin: 'java-library'
@@ -376,55 +377,60 @@ if (version.toLowerCase().contains("alpha")) {
 }
 
 // Publishing
-if (System.getenv("CURSEFORGE_API_KEY") && !version.endsWith("-SNAPSHOT")) {
-    curseforge {
-        apiKey = System.getenv().get("CURSEFORGE_API_KEY")
-        project {
-            id = project.curseforge_project
-            releaseType = releaseChannel
-            changelogType = "markdown"
-            delegate.changelog = changelog
+unifiedPublishing {
+    project {
+        displayName = "Modern Industrialization v${version}" // Optional, name of the file
+        version = version// Optional, Inferred from project by default
+        changelog = changelog // Optional, in markdown format
+        releaseType = releaseChannel // Optional, use "release", "beta" or "alpha"
+        gameVersions = ["1.19"]
+        gameLoaders = ["fabric"]
 
-            addGameVersion "1.19"
-            addGameVersion "Fabric"
-            addGameVersion "Java 17"
+        mainPublication tasks.remapJar // Declares the publicated jar
 
-            relations {
-                requiredDependency "fabric-api"
-                requiredDependency "roughly-enough-items"
-                requiredDependency "cloth-config"
-                optionalDependency "wthit"
-                optionalDependency "megane"
-                embeddedLibrary "no-indium"
-                embeddedLibrary "patchouli-fabric"
-                embeddedLibrary "pal"
+        relations {
+            depends { // Mark as a required dependency
+                curseforge = "fabric-api" // Optional, project slug
+                modrinth = "fabric-api" // Optional, project slug or id
             }
-            mainArtifact(remapJar.archiveFile) {
-                displayName = "Modern Industrialization v${version}"
+            depends {
+                curseforge = "roughly-enough-items"
+                modrinth = "roughly-enough-items"
             }
+            depends {
+                curseforge = "cloth-config"
+                modrinth = "cloth-config"
+            }
+            optional {
+                curseforge = "wthit"
+                modrinth = ""
+            }
+            optional {
+                curseforge = "megane"
+                modrinth = "megane"
+            }
+            includes {
+                curseforge = "no-indium"
+                modrinth = "no-indium"
+            }
+            includes {
+                curseforge = "patchouli-fabric"
+                modrinth = "patchouli"
+            }
+            includes {
+                curseforge = "pal"
+            }
+            conflicts {} // Mark as a conflicted dependency
         }
-        options {
-            forgeGradleIntegration = false
+
+        curseforge {
+            token = System.getenv("CURSEFORGE_API_KEY")
+            id = project.curseforge_project // Required, must be a string, ID of CurseForge project
         }
-        afterEvaluate {
-            tasks.getByName("curseforge${project.curseforge_project}").dependsOn remapJar
+
+        modrinth {
+            token = System.getenv("MODRINTH_API_KEY")
+            id = project.modrinth_project // Required, must be a string, ID of Modrinth project
         }
     }
-}
-
-import com.modrinth.minotaur.TaskModrinthUpload
-
-task publishModrinth (type: TaskModrinthUpload){
-    onlyIf {
-        System.getenv("MODRINTH_API_KEY") && !version.endsWith("-SNAPSHOT")
-    }
-    token = System.getenv("MODRINTH_API_KEY")
-    projectId = project.modrinth_project
-    versionNumber = version
-    versionName = "Modern Industrialization v${version}"
-    delegate.changelog = changelog
-    versionType = releaseChannel.toUpperCase()
-    uploadFile = remapJar.archiveFile
-    addGameVersion "1.19"
-    addLoader "fabric"
 }
