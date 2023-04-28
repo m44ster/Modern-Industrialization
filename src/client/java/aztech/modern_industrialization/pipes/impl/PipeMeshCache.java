@@ -45,6 +45,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.BlockAndTintGetter;
 import org.jetbrains.annotations.Nullable;
 
+import static aztech.modern_industrialization.pipes.impl.PipePartBuilder.getLogicalSlot;
+
 public class PipeMeshCache implements PipeRenderer {
     /**
      * The cached meshes for the connections. Indexed by: [endpoint
@@ -82,10 +84,10 @@ public class PipeMeshCache implements PipeRenderer {
                         MeshBuilder meshBuilder = renderer.meshBuilder();
                         PipeMeshBuilder pmb;
                         if (innerQuads) {
-                            pmb = new PipeMeshBuilder.InnerQuads(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(logicalSlot), direction,
+                            pmb = new PipeMeshBuilder.InnerQuads(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(getLogicalSlot(logicalSlot)), direction,
                                     sprite);
                         } else {
-                            pmb = new PipeMeshBuilder(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(logicalSlot), direction, sprite);
+                            pmb = new PipeMeshBuilder(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(getLogicalSlot(logicalSlot)), direction, sprite);
                         }
                         boolean reduced = j >= 4;
                         boolean end = i != 0;
@@ -113,9 +115,9 @@ public class PipeMeshCache implements PipeRenderer {
                 for (Direction direction : Direction.values()) {
                     PipeMeshBuilder pmb;
                     if (innerQuads) {
-                        pmb = new PipeMeshBuilder.InnerQuads(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(logicalSlot), direction, sprite);
+                        pmb = new PipeMeshBuilder.InnerQuads(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(getLogicalSlot(logicalSlot)), direction, sprite);
                     } else {
-                        pmb = new PipeMeshBuilder(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(logicalSlot), direction, sprite);
+                        pmb = new PipeMeshBuilder(meshBuilder.getEmitter(), PipePartBuilder.getSlotPos(getLogicalSlot(logicalSlot)), direction, sprite);
                     }
                     pmb.noConnection(mask);
                 }

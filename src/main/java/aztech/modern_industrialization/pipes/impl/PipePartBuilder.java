@@ -226,6 +226,23 @@ abstract class PipePartBuilder {
         return slot == 0 ? 1 : slot == 1 ? 0 : 2;
     }
 
+
+    /**
+     * Get the logical slot.
+     */
+    static int getLogicalSlot(int logicalSlot){//,PipeEndpointType[][] connections){
+        //The logical slot, so 0 for center, 1 for lower and 2 for upper.
+        switch (logicalSlot){
+            case 0:
+                return 1;
+            case 1:
+                return 0;
+            case 2:
+                return 2;
+        }
+        throw new RuntimeException();
+    }
+
     /**
      * Get the type of a connection.
      */
@@ -238,23 +255,23 @@ abstract class PipePartBuilder {
             return 1;
         } else {
             int connSlot = 0;
-            for (int i = 0; i < logicalSlot; i++) {
-                if (connections[i][direction.get3DDataValue()] != null) {
+            for (int i = 0; i < getLogicalSlot(logicalSlot); i++) {
+                if (connections.length>getLogicalSlot(i) && connections[getLogicalSlot(i)][direction.get3DDataValue()] != null) {
                     connSlot++;
                 }
             }
-            if (logicalSlot == 1) {
+            if (getLogicalSlot(logicalSlot) == 1) {
                 // short bend
-                if (connSlot == 0) {
+                if (getLogicalSlot(connSlot) == 0) {
                     // same as below
                     return direction == EAST ? 3 : 2;
                 }
-            } else if (logicalSlot == 2) {
-                if (connSlot == 0) {
+            } else if (getLogicalSlot(logicalSlot) == 2) {
+                if (getLogicalSlot(connSlot) == 0) {
                     // short bend, but far if the direction is west to avoid collisions in some
                     // cases.
                     return direction == WEST ? 3 : 2;
-                } else if (connSlot == 1) {
+                } else if (getLogicalSlot(connSlot) == 1) {
                     // long bend
                     return 4;
                 }
@@ -269,14 +286,14 @@ abstract class PipePartBuilder {
      */
     static Direction getInitialDirection(int logicalSlot, Direction connectionDirection, int renderType) {
         if (renderType == 2) { // only for short bend
-            if (logicalSlot == 1) {
+            if (getLogicalSlot(logicalSlot) == 1) {
                 if (connectionDirection == NORTH)
                     return UP;
                 if (connectionDirection == WEST)
                     return SOUTH;
                 if (connectionDirection == DOWN)
                     return EAST;
-            } else if (logicalSlot == 2) {
+            } else if (getLogicalSlot(logicalSlot) == 2) {
                 if (connectionDirection == UP)
                     return NORTH;
                 if (connectionDirection == SOUTH)
